@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+
+    <ui:define name="title">Estoque</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formEstoque">
+
+            <p:messages id="mens" >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <p:panelGrid id="tabelaProduto" columns="1" layout="grid" columnClasses="ui-grid-col-12" styleClass="painel_grid_noborder"  >
+
+
+                <p:toolbar styleClass="toolbar">
+                    <p:toolbarGroup  >
+                        <p:commandButton value="Pesquisar" actionListener="#{estoqueC.pesquisar()}"
+                                         update="dadosEstoque" process="@this panelGridPesq" />
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+                <p:panelGrid id="panelGridPesq" columns="2" layout="grid" columnClasses="ui-grid-col-1, ui-grid-col-1, ui-grid-col-10" 
+                             styleClass="painel_grid_noborder" >
+
+                    <p:outputLabel for="pesqNome" value="Produto: "/>
+                    <p:inputText id="pesqNome" value="#{estoqueC.produto.nome}" style="margin-left: 5px"/>
+                    <p:spacer />
+
+                </p:panelGrid>
+
+                <p:dataTable id="dadosEstoque" value="#{estoqueC.modelProdutos}" var="produto" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+                             {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             emptyMessage="Nenhum produto encontrado">
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="dadosEstoque" fileName="Estoque" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="dadosEstoque" fileName="Estoque" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <p:column headerText="Tipo" sortBy="#{produto.nome}">
+                        <p:outputLabel value="#{produto.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Marca" sortBy="#{produto.marca.nome}">
+                        <p:outputLabel value="#{produto.marca.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Categoria" sortBy="#{produto.categoria.nome}">
+                        <p:outputLabel value="#{produto.categoria.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Quantidade" sortBy="#{produto.quantidade}">
+                        <p:outputLabel value="#{produto.quantidade}" />
+                    </p:column>
+
+                    <p:column headerText="Preço" sortBy="#{produto.preco}">
+                        <p:outputLabel value="#{produto.preco}" />
+                    </p:column>
+
+                    <p:column headerText="Alterar" class="centralizado tabela_botao_usuario" priority="1" >
+                        <p:commandButton icon="ui-icon-pencil" title="Alterar" update="@form" process="@this" 
+                                         actionListener="#{estoqueC.carregarParaAlterar()}"
+                                         oncomplete="PF('modalAlterarProduto').show();">
+                            <f:setPropertyActionListener target="#{estoqueC.produto}" value="#{produto}"   />          
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:panelGrid>
+
+            <p:dialog header="Alterar Quantidade do Produto" widgetVar="modalAlterarProduto" showEffect="explode" hideEffect="bounce" height="100">
+
+                <p:panelGrid id="alterarProduto" columns="2" layout="grid" columnClasses="ui-grid-col-4, ui-grid-col-4, ui-grid-col-4" styleClass="painel_grid_noborder"  >
+
+                    <p:outputLabel for="quantidadeProduto" value="Quantidade: " />
+                    <p:inputText id="quantidadeProduto" value="#{estoqueC.produto.quantidade}" size="15"/>
+
+                    <p:commandButton value="Salvar" action="#{estoqueC.alterar()}" update="@form" />
+                    <p:commandButton value="Fechar" immediate="true" update="@form" global="false" />
+
+                </p:panelGrid>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

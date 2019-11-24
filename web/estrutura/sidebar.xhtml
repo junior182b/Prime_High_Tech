@@ -1,0 +1,109 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:po="http://primefaces.org/omega">
+    <h:form id="menuform">
+        <div class="sidebar">
+            <div class="nano">
+                <div class="nano-content sidebar-scroll-content">
+
+                    <div class="logo">
+                        <p:graphicImage name="images/logo.png" library="omega-layout" width="113"/>
+                    </div>
+
+
+                    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"  />
+
+                    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="aguarde.gif" library="images"/>
+                    </p:dialog>
+
+                    <div class="menu">
+
+                        <nav>
+                            <ul>
+
+                                <h:panelGroup rendered="#{request.isUserInRole('ROLE_VENDEDOR')}" >
+
+                                    <li>
+                                        <h:link outcome="/vendedor/estoque">
+                                            <i class="fa fa-sign-in"/>
+                                            <span>Estoque</span>
+                                        </h:link>
+                                    </li>
+
+                                    <li>
+                                        <h:link outcome="/vendedor/pedido">
+                                            <i class="fa fa-sign-in"/> 
+                                            <span>Pedido</span>
+                                        </h:link>
+                                    </li>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{request.isUserInRole('ROLE_ADMIN')}" >
+
+                                    <li>
+                                        <h:link outcome="/administrador/categoria">
+                                            <i class="fa fa-product-hunt"/>
+                                            <span>Categoria</span>
+                                        </h:link>
+                                    </li>
+
+                                    <li>
+                                        <h:link outcome="/administrador/cliente">
+                                            <i class="fa fa-sign-in"/>
+                                            <span>Cliente</span>
+                                        </h:link>
+                                    </li>
+
+                                    <li>
+                                        <h:link outcome="/administrador/funcionario">
+                                            <i class="fa fa-user"/>
+                                            <span>Funcionário</span>
+                                        </h:link>
+                                    </li>
+
+                                    <li>
+                                        <h:link outcome="/administrador/marca">
+                                            <i class="fa fa-product-hunt"/>
+                                            <span>Marca</span>
+                                        </h:link>
+                                    </li>
+
+                                    <li>
+                                        <h:link outcome="/administrador/produto">
+                                            <i class="fa fa-product-hunt"/>
+                                            <span>Produto</span>
+                                        </h:link>
+                                    </li>
+
+                                </h:panelGroup>
+
+                                <li>
+                                    <h:link outcome="/vendedor/relatorio">
+                                        <i class="fa fa-sign-in"/>
+                                        <span>Relatório</span>
+                                    </h:link>
+                                </li>
+
+                                <li>
+                                    <a href="PrimeHighTech/logout">
+                                        <i class="fa fa-fw fa-sign-out"/>
+                                        <span>Sair</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>

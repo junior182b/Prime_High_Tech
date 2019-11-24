@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+    <ui:define name="title">Produto</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="form_pesquisa">
+
+            <p:messages id="mens"  >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <h:panelGroup id="aba1" rendered="#{!produtoC.mostrar_toolbar}" >
+
+                <p:toolbar styleClass="toolbar">
+                    <p:toolbarGroup  >
+                        <p:commandButton value="Pesquisar" actionListener="#{produtoC.pesquisar()}"
+                                         update="dadosProduto" process="@this panelGridPesq" />
+                        <p:separator></p:separator>
+                        <p:commandButton value="Novo" actionListener="#{produtoC.novo}" update="@form" global="false"  />
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+                <p:panelGrid id="panelGridPesq" columns="2" layout="grid" columnClasses="ui-grid-col-1, ui-grid-col-1, ui-grid-col-10" styleClass="painel_grid_noborder" >
+
+                    <p:outputLabel for="pesqNome" value="Produto: "/>
+                    <p:inputText id="pesqNome" value="#{produtoC.produto.nome}" style="margin-left: 5px"/>
+                    <p:spacer />
+
+                </p:panelGrid>
+
+                <p:dataTable id="dadosProduto" value="#{produtoC.modelProdutos}" var="produto" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+                             {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             emptyMessage="Nenhum Produto encontrado">
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="dadosProduto" fileName="Produto" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="dadosProduto" fileName="Produto" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <p:column headerText="Produto" priority="1">
+                        <h:outputText value="#{produto.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="Marca" priority="1">
+                        <h:outputText value="#{produto.marca.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Categoria" priority="1">
+                        <h:outputText value="#{produto.categoria.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Valor" priority="1">
+                        <h:outputText value="R$ #{produto.preco}" >
+                            <f:convertNumber pattern="0,00"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Alterar" class="centralizado tabela_botao_usuario" priority="1" >
+                        <p:commandButton icon="ui-icon-pencil" title="Alterar" process="@this" update="@form" actionListener="#{produtoC.carregarParaAlterar()}">
+                            <f:setPropertyActionListener target="#{produtoC.produto}" value="#{produto}"   />          
+                        </p:commandButton>
+
+                        <p:commandButton icon="ui-icon-trash" actionListener="#{produtoC.excluir()}" update="dadosProduto" title="Excluir" >
+                            <p:confirm header="Confirmação" message="Tem certeza exclusão?" icon="ui-icon-alert" />
+                            <f:setPropertyActionListener target="#{produtoC.produto}" value="#{produto}"   />
+                        </p:commandButton>
+
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:panelGroup> 
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" 
+                                 icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" 
+                                 icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <h:panelGroup id="aba_alterar" rendered="#{produtoC.mostrar_toolbar}">
+
+                <p:fieldset legend="Dados do Produto" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-2, ui-grid-col-5" 
+                                 styleClass="painel_grid_noborder" style="width: 100%">
+
+                        <p:outputLabel for="categoria" value="Categoria: " />
+                        <p:selectOneMenu styleClass="form-control" id="categoria" value="#{produtoC.categoria.id}" required="true" 
+                                         requiredMessage="Categoria é obrigatório"  >
+                            <f:selectItem itemLabel="Selecione uma Categoria" itemValue="" />
+                            <f:selectItems value="#{produtoC.categorias}" />
+                        </p:selectOneMenu>
+                        <p:commandButton value="Add Categoria" type="button" onclick="PF('dlgCategoria').show();" /> 
+
+
+                        <p:outputLabel for="nomeProduto" value="Nome: " />
+                        <p:inputText id="nomeProduto" value="#{produtoC.produto.nome}" size="49"/>
+                        <p:spacer/>
+
+                        <p:outputLabel for="marca" value="Marca: " />
+                        <p:selectOneMenu styleClass="form-control" id="marca" value="#{produtoC.marca.id}" required="true" 
+                                         requiredMessage="Marca é obrigatório"  >
+                            <f:selectItem itemLabel="Selecione uma Marca" itemValue="" />
+                            <f:selectItems value="#{produtoC.marcas}" />
+                        </p:selectOneMenu>
+                        <p:commandButton value="Add Marca" type="button" onclick="PF('dlgMarca').show();" /> 
+
+                        <p:outputLabel for="nomePreco" value="Preço: " />
+                        <p:inputText id="nomePreco" value="#{produtoC.produto.preco}" size="49"/>
+                        <p:spacer/>
+
+
+                        <p:commandButton value="Salvar" action="#{produtoC.salvar()}" update="aba_alterar" />
+                        <p:commandButton value="Cancelar" actionListener="#{produtoC.novaPesquisa}" immediate="true"
+                                         update="@form" global="false" />
+                        <p:spacer/>
+
+                    </p:panelGrid>
+
+                    <p:dialog id="dlgC" header="Nova Categoria" widgetVar="dlgCategoria" showEffect="explode" hideEffect="bounce" height="100">
+
+                        <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" 
+                                     styleClass="painel_grid_noborder" style="width: 100%">
+
+                            <p:outputLabel for="nomeCategoria" value="Categoria: " />
+                            <p:inputText id="nomeCategoria" value="#{produtoC.categoria.nome}" size="49"/>
+
+                            <p:commandButton value="Salvar" action="#{produtoC.salvarCategoria()}" process="@this, dlgC" update="dlgC, categoria" />
+                            <p:commandButton value="Cancelar" immediate="true" global="false" />
+
+                        </p:panelGrid>
+
+                    </p:dialog>
+
+                    <p:dialog id="dlgM" header="Nova Marca" widgetVar="dlgMarca" showEffect="explode" hideEffect="bounce" height="100">
+
+                        <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" 
+                                     styleClass="painel_grid_noborder" style="width: 100%">
+
+                            <p:outputLabel for="nomeMarca" value="Marca: " />
+                            <p:inputText id="nomeMarca" value="#{produtoC.marca.nome}" size="49"/>
+
+                            <p:commandButton value="Salvar" action="#{produtoC.salvarMarca()}" process="@this, dlgM" update="dlgM, marca" />
+                            <p:commandButton value="Cancelar" immediate="true" global="false" />
+
+                        </p:panelGrid>
+
+                    </p:dialog>
+
+                </p:fieldset>
+
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

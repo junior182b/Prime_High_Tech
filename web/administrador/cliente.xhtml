@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+    <ui:define name="title">Cliente</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="form_pesquisa">
+
+            <p:messages id="mens"  >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <h:panelGroup id="aba1" rendered="#{!clienteC.mostrar_toolbar}" >
+
+                <p:toolbar styleClass="toolbar">
+
+                    <p:toolbarGroup  >
+
+                        <p:commandButton value="Pesquisar" actionListener="#{clienteC.pesquisar()}"
+                                         update="dadosCliente" process="@this panelGridPesq" />
+                        <p:separator></p:separator>
+                        <p:commandButton value="Novo" actionListener="#{clienteC.novo}" update="@form" global="false"  />
+
+                    </p:toolbarGroup>
+
+                </p:toolbar>
+
+                <p:panelGrid id="panelGridPesq" columns="2" layout="grid" columnClasses="ui-grid-col-1, ui-grid-col-1, ui-grid-col-10" styleClass="painel_grid_noborder" >
+
+                    <p:outputLabel for="pesqNome" value="Cliente: "/>
+                    <p:inputText id="pesqNome" value="#{clienteC.cliente.nome}" style="margin-left: 5px"/>
+                    <p:spacer />
+
+                </p:panelGrid>
+
+                <p:dataTable id="dadosCliente" value="#{clienteC.modelClientes}" var="cliente" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+                             {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             emptyMessage="Nenhum cliente encontrado">
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="dadosCliente" fileName="Clientes" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="dadosCliente" fileName="Clientes" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <p:column headerText="Cliente" priority="1">
+                        <h:outputText value="#{cliente.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="CPF" priority="1">
+                        <h:outputText value="#{cliente.cpf}" />
+                    </p:column>
+
+                    <p:column headerText="Data Contratação">
+                        <h:outputText value="#{cliente.dtCadastro}">
+                            <f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Alterar" class="centralizado tabela_botao_usuario" priority="1" >
+
+                        <p:commandButton icon="ui-icon-pencil" title="Alterar" process="@this" update="@form" actionListener="#{clienteC.carregarParaAlterar()}">
+                            <f:setPropertyActionListener target="#{clienteC.cliente}" value="#{cliente}"   />          
+                        </p:commandButton>
+
+                        <p:commandButton icon="ui-icon-trash" actionListener="#{clienteC.excluir()}" update="dadosCliente" title="Excluir" >
+                            <p:confirm header="Confirmação" message="Tem certeza exclusão?" icon="ui-icon-alert" />
+                            <f:setPropertyActionListener target="#{clienteC.cliente}" value="#{cliente}"   />
+                        </p:commandButton>
+
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:panelGroup> 
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" 
+                                 icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" 
+                                 icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <h:panelGroup id="aba_alterar" rendered="#{clienteC.mostrar_toolbar}">
+
+                <p:fieldset legend="Dados do Cliente" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" styleClass="painel_grid_noborder" 
+                                 style="width: 100%">
+
+                        <p:outputLabel for="nomeFunc" value="Nome:" />
+                        <p:inputText id="nomeFunc" value="#{clienteC.cliente.nome}" size="40"/>
+
+                        <p:outputLabel for="cpfFunc" value="CPF:" />
+                        <p:inputMask id="cpfFunc" value="#{clienteC.cliente.cpf}" mask="999.999.999-99" size="40" />
+                        
+                        <p:outputLabel for="telefoneCliente" value="Telefone: " />
+                        <p:inputMask id="telefoneCliente" mask="(99) 9999-9999" value="#{clienteC.contato.telefone}"/>
+
+                        <p:outputLabel for="celularCliente" value="Celular: " />
+                        <p:inputMask id="celularCliente" mask="(99) 99999-9999" value="#{clienteC.contato.celular}"/>
+
+                        <p:outputLabel for="whatsappCliente" value="Whatsapp:" />
+                        <p:selectBooleanButton id="whatsappCliente" value="#{clienteC.contato.whatsapp}" onLabel="Sim" offLabel="Não" onIcon="ui-icon-check" offIcon="ui-icon-close"/>
+
+                        <p:outputLabel for="emailCliente" value="E-mail: " />
+                        <p:inputText id="emailCliente" maxlength="30" value="#{clienteC.contato.email}"/>
+
+                    </p:panelGrid>
+
+                </p:fieldset>
+
+                <p:fieldset legend="Endereço" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" styleClass="painel_grid_noborder" 
+                                 style="width: 100%">
+
+                        <p:outputLabel for="logradouroEndereco" value="Logradouro:" />
+                        <p:inputText id="logradouroEndereco" maxlength="30" value="#{clienteC.endereco.logradouro}"/>
+
+                        <p:outputLabel for="numeroEndereco" value="Número:" />
+                        <p:inputText id="numeroEndereco" maxlength="5" value="#{clienteC.endereco.numero}" />
+
+                        <p:outputLabel for="complementoEndereco" value="Complemento:" />
+                        <p:inputText id="complementoEndereco" maxlength="30" value="#{clienteC.endereco.complemento}"/>
+
+                        <p:outputLabel for="cepEndereco" value="Cep:" />
+                        <p:inputMask id="cepEndereco" value="#{clienteC.endereco.cep}" mask="99999-999"/>
+
+                        <p:outputLabel for="bairroEndereco" value="Bairro:" />
+                        <p:inputText id="bairroEndereco" maxlength="20" value="#{clienteC.endereco.bairro}"/>
+
+                        <p:outputLabel for="cidadeEndereco" value="Cidade:" />
+                        <p:inputText id="cidadeEndereco" maxlength="20" value="#{clienteC.endereco.cidade}"/>
+
+                        <p:outputLabel for="ufEndereco" value="UF:" />
+                        <p:inputMask id="ufEndereco" maxlength="2" mask="aa" style="text-transform: uppercase" value="#{clienteC.endereco.uf}" size="2"/>
+
+                        <p:outputLabel for="paisEndereco" value="Pais:" />
+                        <p:inputText id="paisEndereco" maxlength="15" value="#{clienteC.endereco.pais}"/>
+
+                        <p:commandButton value="Salvar" action="#{clienteC.salvar()}" update="aba_alterar" />
+                        <p:commandButton value="Cancelar" actionListener="#{clienteC.novaPesquisa}" immediate="true"
+                                         update="@form" global="false" />
+                    </p:panelGrid>
+
+                </p:fieldset>
+
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
+

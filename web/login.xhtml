@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>Controle GLP</title>
+    </h:head>
+
+    <h:body styleClass="login-body">
+
+        <div id="login-wrapper">
+
+            <form class="form-signin" role="form" action="j_spring_security_check" method="POST">
+
+                <p:outputLabel value="Dados incorretos!" rendered="#{param.erro}" style="color: red" />
+                <p:outputLabel value="Sem permissão de acesso!" rendered="#{param.negado}" style="color: darkred" />
+
+                <div id="login-container">
+                    <span class="title">Prime High Tech</span>
+
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-g-12">
+                            <input class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all"
+                                   type="text" name="j_username" placeholder="Usuário" />
+                        </div>
+                        <div class="ui-g-12">
+                            <input class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all"
+                                   type="password" name="j_password" placeholder="Senha" feedback="false"/>
+                        </div>
+                        <div class="ui-g-12">
+                            <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left"
+                                    type="submit" style="background: #2399e5">
+                                <span class="ui-button-icon-left ui-icon ui-c fa fa-check"></span>        
+                                <span class="ui-button-text ui-c" style="color: #FFFFFF">Entrar</span>
+                            </button>
+                        </div>
+                       
+                        
+                        <div class="ui-g-12 ui-md-6">
+                            <input type="checkbox" id="remember-me" name="remember-me" />
+                            <label for="remember-me">Lembrar de Mim</label>
+                        </div>
+                        
+                         <div class="ui-g-12 ui-md-6">
+                            <span />
+                            <p:selectBooleanCheckbox rendered="false" />
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="login-footer">GLP System</div>
+            </form>
+        </div>
+        <h:outputStylesheet name="css/layout.css" library="omega-layout" />
+    </h:body>
+</html>

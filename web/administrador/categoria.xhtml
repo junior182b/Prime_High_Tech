@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+
+    <ui:define name="title">Categoria</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formCategoria">
+
+            <p:messages id="mens" >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <p:panelGrid id="tabelaProduto" columns="1" layout="grid" columnClasses="ui-grid-col-12" styleClass="painel_grid_noborder"  >
+
+
+                <p:toolbar styleClass="toolbar">
+                    <p:toolbarGroup  >
+                        <p:commandButton value="Pesquisar" actionListener="#{categoriaC.pesquisar()}"
+                                         update="dadosCategoria" process="@this panelGridPesq" />
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+                <p:panelGrid id="panelGridPesq" columns="2" layout="grid" columnClasses="ui-grid-col-1, ui-grid-col-1, ui-grid-col-10" 
+                             styleClass="painel_grid_noborder" >
+
+                    <p:outputLabel for="pesqCategoria" value="Categoria: "/>
+                    <p:inputText id="pesqCategoria" value="#{categoriaC.categoria.nome}" style="margin-left: 5px"/>
+                    <p:spacer />
+
+                </p:panelGrid>
+
+                <p:dataTable id="dadosCategoria" value="#{categoriaC.modelCategorias}" var="categoria" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+                             {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             emptyMessage="Nenhum categoria encontrado">
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="dadosCategoria" fileName="Estoque" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="dadosCategoria" fileName="Estoque" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <p:column headerText="Tipo" sortBy="#{categoria.nome}">
+                        <p:outputLabel value="#{categoria.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Ativado" sortBy="#{categoria.ativo}">
+                        <p:outputLabel value="#{categoria.ativo}" />
+                    </p:column>
+
+                    <p:column headerText="Alterar" class="centralizado tabela_botao_usuario" priority="1" >
+
+                        <p:commandButton icon="ui-icon-pencil" title="Alterar" update="@form" process="@this" 
+                                         actionListener="#{categoriaC.carregarParaAlterar()}"
+                                         oncomplete="PF('modalAlterarProduto').show();">
+                            <f:setPropertyActionListener target="#{categoriaC.categoria}" value="#{categoria}"   />          
+                        </p:commandButton>
+
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:panelGrid>
+
+            <p:dialog header="Alterar Quantidade do Produto" widgetVar="modalAlterarProduto" showEffect="explode" hideEffect="bounce" height="100">
+
+                <p:panelGrid id="alterarProduto" columns="2" layout="grid" columnClasses="ui-grid-col-4, ui-grid-col-4, ui-grid-col-4" styleClass="painel_grid_noborder"  >
+
+                    <p:outputLabel for="nomeCategoria" value="Marca " />
+                    <p:inputText id="nomeCategoria" value="#{categoriaC.categoria.nome}" size="15"/>
+
+                    <p:outputLabel for="categoriaAtivada" value="Ativado" />
+                    <p:selectBooleanButton id="categoriaAtivada" value="#{categoriaC.categoria.ativo}" 
+                                           onLabel="Sim" offLabel="Não" onIcon="ui-icon-check" offIcon="ui-icon-close"/>
+
+                    <p:commandButton value="Salvar" action="#{categoriaC.alterar()}" update="@form" />
+                    <p:commandButton value="Fechar" immediate="true" update="@form" global="false" />
+
+                </p:panelGrid>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

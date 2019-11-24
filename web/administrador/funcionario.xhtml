@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+    <ui:define name="title">Funcionário</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="form_pesquisa">
+
+            <p:messages id="mens"  >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <h:panelGroup id="aba1" rendered="#{!funcionarioC.mostrar_toolbar}" >
+
+                <p:toolbar styleClass="toolbar">
+                    <p:toolbarGroup  >
+                        <p:commandButton value="Pesquisar" actionListener="#{funcionarioC.pesquisar()}"
+                                         update="dadosFuncionario" process="@this panelGridPesq" />
+                        <p:separator></p:separator>
+                        <p:commandButton value="Novo" actionListener="#{funcionarioC.novo}" update="@form" global="false"  />
+                    </p:toolbarGroup>
+                </p:toolbar>
+
+                <p:panelGrid id="panelGridPesq" columns="2" layout="grid" columnClasses="ui-grid-col-1, ui-grid-col-1, ui-grid-col-10" styleClass="painel_grid_noborder" >
+
+                    <p:outputLabel for="pesqNome" value="Funcionario: "/>
+                    <p:inputText id="pesqNome" value="#{funcionarioC.funcionario.nome}" style="margin-left: 5px"/>
+                    <p:spacer />
+
+                </p:panelGrid>
+
+                <p:dataTable id="dadosFuncionario" value="#{funcionarioC.modelFuncionarios}" var="funcionario" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} 
+                             {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             emptyMessage="Nenhum Funcionário encontrado">
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="dadosFuncionario" fileName="Funcionário" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="dadosFuncionario" fileName="Funcionário" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <p:column headerText="Nome" priority="1">
+                        <h:outputText value="#{funcionario.nome}"/>
+                    </p:column>
+
+                    <p:column headerText="CPF" priority="1">
+                        <h:outputText value="#{funcionario.cpf}" />
+                    </p:column>
+
+                    <p:column headerText="RG" priority="1">
+                        <h:outputText value="#{funcionario.rg}" />
+                    </p:column>
+
+                    <p:column headerText="Matricula" priority="1">
+                        <h:outputText value="#{funcionario.matricula}" />
+                    </p:column>
+
+                    <p:column headerText="Data Contratação">
+                        <h:outputText value="#{funcionario.dtCadastro}">
+                            <f:convertDateTime locale="pt_BR" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+
+                    </p:column>
+
+                    <p:column headerText="Alterar" class="centralizado tabela_botao_usuario" priority="1" >
+                        <p:commandButton icon="ui-icon-pencil" title="Alterar" process="@this" update="@form" actionListener="#{funcionarioC.carregarParaAlterar()}">
+                            <f:setPropertyActionListener target="#{funcionarioC.funcionario}" value="#{funcionario}"   />          
+                        </p:commandButton>
+
+                        <p:commandButton icon="ui-icon-trash" actionListener="#{funcionarioC.excluir()}" update="dadosFuncionario" title="Excluir" >
+                            <p:confirm header="Confirmação" message="Tem certeza exclusão?" icon="ui-icon-alert" />
+                            <f:setPropertyActionListener target="#{funcionarioC.funcionario}" value="#{funcionario}"   />
+                        </p:commandButton>
+
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:panelGroup> 
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" 
+                                 icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" 
+                                 icon="ui-icon-close" />
+            </p:confirmDialog>
+
+            <h:panelGroup id="aba_alterar" rendered="#{funcionarioC.mostrar_toolbar}">
+
+                <p:fieldset legend="Dados do Funcionario" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" styleClass="painel_grid_noborder" 
+                                 style="width: 100%">
+
+                        <p:outputLabel for="nomeFunc" value="Nome:" />
+                        <p:inputText id="nomeFunc" value="#{funcionarioC.funcionario.nome}" size="40"/>
+
+                        <p:outputLabel for="rgFunc" value="RG:" />
+                        <p:inputMask id="rgFunc" value="#{funcionarioC.funcionario.rg}"  mask="9.999.999" size="40" />
+
+                        <p:outputLabel for="cpfFunc" value="CPF:" />
+                        <p:inputMask id="cpfFunc" value="#{funcionarioC.funcionario.cpf}" mask="999.999.999-99" size="40" />
+
+                        <p:outputLabel for="matriculaFunc" value="Matricula:" />
+                        <p:inputText id="matriculaFunc" value="#{funcionarioC.funcionario.matricula}" size="40"/>
+
+                        <p:outputLabel for="telefoneCliente" value="Telefone: " />
+                        <p:inputMask id="telefoneCliente" mask="(99) 9999-9999" value="#{funcionarioC.contato.telefone}"/>
+
+                        <p:outputLabel for="celularCliente" value="Celular: " />
+                        <p:inputMask id="celularCliente" mask="(99) 99999-9999" value="#{funcionarioC.contato.celular}"/>
+
+                        <p:outputLabel for="whatsappCliente" value="Whatsapp:" />
+                        <p:selectBooleanButton id="whatsappCliente" value="#{funcionarioC.contato.whatsapp}" 
+                                               onLabel="Sim" offLabel="Não" onIcon="ui-icon-check" offIcon="ui-icon-close"/>
+
+                        <p:outputLabel for="emailCliente" value="E-mail: " />
+                        <p:inputText id="emailCliente" maxlength="30" value="#{funcionarioC.contato.email}"/>
+
+                    </p:panelGrid>
+
+                </p:fieldset>
+
+
+                <p:fieldset legend="Endereço" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" styleClass="painel_grid_noborder" 
+                                 style="width: 100%">
+
+                        <p:outputLabel for="logradouroEndereco" value="Logradouro:" />
+                        <p:inputText id="logradouroEndereco" maxlength="30" value="#{funcionarioC.endereco.logradouro}"/>
+
+                        <p:outputLabel for="numeroEndereco" value="Número:" />
+                        <p:inputText id="numeroEndereco" maxlength="5" value="#{funcionarioC.endereco.numero}" />
+
+                        <p:outputLabel for="complementoEndereco" value="Complemento:" />
+                        <p:inputText id="complementoEndereco" maxlength="30" value="#{funcionarioC.endereco.complemento}"/>
+
+                        <p:outputLabel for="cepEndereco" value="Cep:" />
+                        <p:inputMask id="cepEndereco" value="#{funcionarioC.endereco.cep}" mask="99999-999"/>
+
+                        <p:outputLabel for="bairroEndereco" value="Bairro:" />
+                        <p:inputText id="bairroEndereco" maxlength="20" value="#{funcionarioC.endereco.bairro}"/>
+
+                        <p:outputLabel for="cidadeEndereco" value="Cidade:" />
+                        <p:inputText id="cidadeEndereco" maxlength="20" value="#{funcionarioC.endereco.cidade}"/>
+
+                        <p:outputLabel for="ufEndereco" value="UF:" />
+                        <p:inputMask id="ufEndereco" maxlength="2" mask="aa" style="text-transform: uppercase" value="#{funcionarioC.endereco.uf}" size="2"/>
+
+                        <p:outputLabel for="paisEndereco" value="Pais:" />
+                        <p:inputText id="paisEndereco" maxlength="15" value="#{funcionarioC.endereco.pais}"/>
+
+                    </p:panelGrid>
+
+                </p:fieldset>
+
+                <p:fieldset legend="Dados de Acesso" style="margin-bottom:20px; margin-top: 10px">
+
+                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-8" styleClass="painel_grid_noborder" >
+
+                        <p:outputLabel for="loginFunc" value="Login:" />
+                        <p:inputText id="loginFunc" value="#{funcionarioC.usuario.login}" size="40"/>
+
+                        <p:outputLabel for="senhaFunc" value="Senha:" />
+                        <p:inputText type="password" id="senhaFunc" value="#{funcionarioC.usuario.senha}"  size="40"/>
+
+                        <h:outputLabel for="perfilFunc" value="Perfil:" />
+                        <p:selectOneMenu styleClass="form-control" id="perfilFunc" value="#{funcionarioC.perfil.id}" required="true" 
+                                         requiredMessage="Perfil é obrigatório"  >
+                            <f:selectItem itemLabel="Selecione um Perfil" itemValue="" />
+                            <f:selectItems value="#{funcionarioC.perfils}" />
+                        </p:selectOneMenu>
+
+                        <p:commandButton value="Salvar" action="#{funcionarioC.salvar()}" update="aba_alterar" />
+                        <p:commandButton value="Cancelar" actionListener="#{funcionarioC.novaPesquisa}" immediate="true"
+                                         update="@form" global="false" />
+
+                    </p:panelGrid>
+
+                </p:fieldset>
+
+
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

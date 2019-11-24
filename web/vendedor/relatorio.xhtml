@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/estrutura/template.xhtml">
+
+
+
+    <ui:define name="title">Relatório</ui:define>
+
+    <ui:define name="content">
+
+        <h:outputScript name="js/locale-primefaces.js" library="omega-layout"/>
+
+        <h:form id="formRelatorio">
+
+            <p:messages id="mens" >
+                <p:autoUpdate/>
+            </p:messages>
+
+            <p:toolbar id="toolbar_salvar" styleClass="toolbar">
+
+                <p:toolbarGroup  >
+
+                    <p:commandButton value="Pesquisar" actionListener="#{relatorioC.pesquisarPedido()}"
+                                     update="tabelaPedido, tabelaProduto" process="@this dadosPesquisa" />
+
+                    <p:separator/>
+
+                    <p:commandButton value="Limpar Dados" update="formRelatorio" process="@this" />
+
+                </p:toolbarGroup>
+
+            </p:toolbar>
+
+            <p:panelGrid id="dadosPesquisa" columns="1" layout="grid" columnClasses="ui-grid-col-12"
+                         styleClass="painel_grid_noborder"  >
+
+                <p:selectOneRadio id="tipoPesquisa"  value="#{relatorioC.qualPesquisa}" >
+                    <f:selectItem itemLabel="Pedido" itemValue="true" />
+                    <f:selectItem itemLabel="Produto" itemValue="false" />
+                    <p:ajax update="dadosPesquisa, tabelaProduto, tabelaPedido" event="change"/>
+                </p:selectOneRadio>
+
+                <p:separator/>
+
+                <p:outputLabel for="dateInicial" value="Data Iníco:" />
+                <p:calendar id="dateInicial" pattern="dd/MM/yyyy HH:mm" mask="true" locale="pt" value="#{relatorioC.dataInicio}" showOn="button" />
+
+                <p:outputLabel for="dateFinal" value="Data Final:" />
+                <p:calendar id="dateFinal" pattern="dd/MM/yyyy HH:mm" mask="true" locale="pt" value="#{relatorioC.dataFinal}" showOn="button"/>
+
+                <p:outputLabel for="pesqPedido" value="Cliente: " rendered="#{relatorioC.qualPesquisa == true}" />
+                <p:inputText id="pesqPedido"  value="#{relatorioC.nomeCliente}" rendered="#{relatorioC.qualPesquisa == true}" />
+
+                <p:outputLabel for="pesqProduto" value="Produto: " rendered="#{relatorioC.qualPesquisa == false}" />
+                <p:inputText id="pesqProduto" value="#{relatorioC.nomeProduto}" rendered="#{relatorioC.qualPesquisa == false}" />
+
+                <p:separator rendered="#{relatorioC.qualPesquisa == true}"/>
+
+                <p:dataTable id="tabelaPedido" value="#{relatorioC.modelPedido}" var="pedido" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             rendered="#{relatorioC.qualPesquisa == true}"
+                             emptyMessage="Nenhum Pedido encontrado">
+
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="tabelaPedido" fileName="Pedidos" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="tabelaPedido" fileName="Pedidos" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <f:facet name="header">
+                        Pedidos
+                    </f:facet>
+
+                    <p:column headerText="Cliente" sortBy="#{pedido.cliente.nome}">
+                        <p:outputLabel value="#{pedido.cliente.nome}" />
+                    </p:column>
+
+                    <p:column headerText="CPF" sortBy="#{pedido.cliente.cpf}">
+                        <p:outputLabel value="#{pedido.cliente.cpf}" />
+                    </p:column>
+
+                    <p:column headerText="Data do Pedido" sortBy="#{pedido.cadastro}">
+                        <p:outputLabel value="#{pedido.cadastro}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy - HH:mm:ss" timeZone="GMT-02:00"/>
+                        </p:outputLabel>
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:separator rendered="#{relatorioC.qualPesquisa == true}"/>
+
+                <p:separator rendered="#{relatorioC.qualPesquisa == false}"/>
+
+                <p:dataTable id="tabelaProduto" value="#{relatorioC.modelItemPedido}" var="itemPedido" reflow="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {Exporters}"
+                             paginator="true" rows="10" style="margin-bottom:20px"
+                             rendered="#{relatorioC.qualPesquisa == false}"
+                             emptyMessage="Nenhum Produto encontrado">
+
+                    <f:facet name="{Exporters}">
+
+                        <h:commandLink id="excel" style="float: right">
+                            <p:graphicImage library="images" name="excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="tabelaProduto" fileName="Produtos" />
+                        </h:commandLink>
+
+                        <h:commandLink id="pdf" style="float: right">
+                            <p:graphicImage library="images" name="pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="tabelaProduto" fileName="Produtos" />
+                        </h:commandLink>
+
+                    </f:facet>
+
+                    <f:facet name="header">
+                        Produtos
+                    </f:facet>
+
+                    <p:column headerText="Produto" sortBy="#{itemPedido.produto.nomeProduto}">
+                        <p:outputLabel value="#{itemPedido.produto.nomeProduto}" />
+                    </p:column>
+
+                    <p:column headerText="Marca" sortBy="#{itemPedido.produto.marca}">
+                        <p:outputLabel value="#{itemPedido.produto.marca}" />
+                    </p:column>
+
+                    <p:column headerText="Quantidade" sortBy="#{itemPedido.produto.quantidade}">
+                        <p:outputLabel value="#{itemPedido.produto.quantidade}" />
+                    </p:column>
+
+                    <p:column headerText="Data do Pedido" sortBy="#{itemPedido.pedido.cadastro}">
+                        <p:outputLabel value="#{itemPedido.pedido.cadastro}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy - HH:mm:ss" timeZone="GMT-02:00"/>
+                        </p:outputLabel>
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:panelGrid>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
